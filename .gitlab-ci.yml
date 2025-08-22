@@ -1,0 +1,32 @@
+stages:
+    - build
+
+default:
+    image: ghcr.io/astral-sh/uv:debian
+    before_script:
+        - apt update && apt install -y python3-venv
+        - uv sync --resolution highest
+        - mv assets/test-secrets.yaml secrets.yaml
+    interruptible: true # cancel if newer pipeline is created
+    # Cache deps
+    cache:
+        when: always # Still valid if script fails
+        paths:
+            - .venv
+            - ${HOME}/.platformio
+
+
+build:
+    stage: build
+    script:
+        - uv run esphome compile fan32-esphome.yml
+    artifacts:
+      untracked: false
+      when: on_success
+      access: all
+      paths:
+        - .esphome/build/fan32/.pioenvs/fan32/*.bin
+        - .esphome/build/fan32/.pioenvs/fan32/*.elf
+        - .esphome/build/fan32/.pioenvs/fan32/flasher_args.json
+    needs: []
+

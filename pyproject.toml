@@ -1,0 +1,9 @@
+[project]
+name = "fan32-esphome"
+version = "0.1.0"
+description = "Just here to define esphome dependency"
+dependencies = [
+    "esphome",
+    "pip",
+    "virtualenv>=20.34.0",
+]

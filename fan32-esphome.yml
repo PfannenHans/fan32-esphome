@@ -1,0 +1,100 @@
+esphome:
+  name: fan32
+  friendly_name: fan32
+
+esp32:
+  flash_size: 4MB
+  variant: esp32c3
+  cpu_frequency: 160MHz
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Fan32 Fallback Hotspot"
+    password: !secret ap_password
+
+captive_portal:
+
+fan:
+  - platform: speed
+    name: Fan1
+    id: fan1
+    output: fan1_output
+    restore_mode: RESTORE_DEFAULT_OFF
+  - platform: speed
+    name: Fan0
+    id: fan0
+    output: fan0_output
+    restore_mode: RESTORE_DEFAULT_OFF
+
+light:
+  - platform: status_led
+    name: LED
+    pin:
+      number: GPIO20
+      inverted: true
+
+output:
+  - platform: ledc
+    pin:
+      number: GPIO8
+      inverted: true
+      ignore_strapping_warning: true
+    id: fan1_output
+    frequency: 25000
+    channel: 0
+  - platform: ledc
+    pin:
+      number: GPIO9
+      inverted: true
+      ignore_strapping_warning: true
+    id: fan0_output
+    frequency: 25000
+    channel: 1
+
+one_wire:
+  - platform: gpio
+    pin:
+      number: GPIO10
+      mode: INPUT_OUTPUT_OPEN_DRAIN
+
+sensor:
+  - platform: dallas_temp
+    name: Temperature
+    id: temperature
+    resolution: 12
+    update_interval: 10s
+  - platform: pulse_counter
+    name: Fan0 RPM
+    id: fan0_tacho
+    pin:
+      number: GPIO2
+      ignore_strapping_warning: true
+    update_interval: 10s
+    filters:
+      - multiply: 0.5  # Two pulses per rotation
+  - platform: pulse_counter
+    name: Fan1 RPM
+    id: fan1_tacho
+    pin:
+      number: GPIO3
+    update_interval: 10s
+    filters:
+      - multiply: 0.5  # Two pulses per rotation
