@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/astral-sh/uv:debian
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup dependencies
+        run: |
+          apt update && apt install -y python3-venv
+          uv sync --resolution highest
+          mv assets/test-secrets.yaml secrets.yaml
+
+      - name: Build ESPHome
+        run: uv run esphome compile fan32-esphome.yml
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: esphome-build
+          path: |
+            .esphome/build/fan32/.pioenvs/fan32/*.bin
+            .esphome/build/fan32/.pioenvs/fan32/*.elf
+            .esphome/build/fan32/.pioenvs/fan32/flasher_args.json
