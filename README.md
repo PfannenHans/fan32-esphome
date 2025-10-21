@@ -1,6 +1,6 @@
 # FAN32 ESP-Home
 
-`.yml` configuration file for an ESP-Home based firmware for my [FAN32 hardware project](https://github.com/PfannenHans/solar-aqi-pod).
+`.yml` configuration file for an ESP-Home based firmware for my [FAN32 hardware project](https://github.com/PfannenHans/fan32-hardware).
 
 ## Usage
 
